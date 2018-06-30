@@ -3,5 +3,18 @@
 (require rackunit
          "stream.rkt")
 
-;(check-equal? (round (sqrt-heron 4)) 2 "Sqrt4")
-;(check-equal? (round (sqrt-heron 16)) 4 "Sqrt16")
+(test-case
+ "stream wont eval tail until asked"
+ (let ([called #f])
+   (define (next)
+     (set! called #t)
+     (values "head" "tail"))
+     
+   (let ([s (kstream 1 next)])
+     (check-equal? (kstream-head s) 1)
+     (check-equal? called #f)
+     (define-values (head tail) (kstream-tail s))
+     (check-equal? called #t)
+     (check-equal? head "head")
+     (check-equal? tail "tail")
+     )))
