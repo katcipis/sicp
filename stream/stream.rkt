@@ -3,6 +3,7 @@
 (require "cons.rkt")
 
 ;kstream instead of stream because racket already has a stream
+;a stream is basically lazy evaluation done manually
 
 (define (kstream head tail)
   (kons head tail))

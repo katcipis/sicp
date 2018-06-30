@@ -18,3 +18,5 @@
      (check-equal? head "head")
      (check-equal? tail "tail")
      )))
+     
+;TODO: add kstream-nth to index elements on a stream (start looping recursively)
