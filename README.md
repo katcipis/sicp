@@ -1,3 +1,20 @@
+<!-- mdtocstart -->
+
+# Table of Contents
+
+- [Structure and Interpretation of Computer Programs](#structure-and-interpretation-of-computer-programs)
+    - [Framework for analysing languages](#framework-for-analysing-languages)
+    - [Tackling complexity](#tackling-complexity)
+    - [Iteration VS Linear recursion](#iteration-vs-linear-recursion)
+    - [Operator overloading and the glory of prefixed operations](#operator-overloading-and-the-glory-of-prefixed-operations)
+    - [Naming Spirits](#naming-spirits)
+    - [Generic Operators](#generic-operators)
+    - [Assignment, State, and Side-effects](#assignment-state-and-sideeffects)
+    - [Cool Quick Stuff](#cool-quick-stuff)
+    - [Interesting tasks](#interesting-tasks)
+
+<!-- mdtocend -->
+
 # Structure and Interpretation of Computer Programs
 
 All the notes and code I have written during the [SICP course](https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-001-structure-and-interpretation-of-computer-programs-spring-2005/video-lectures/)
