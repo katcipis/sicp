@@ -18,3 +18,10 @@
    (check-equal? (kstream-head nstream) 0)
    (check-equal? (kstream-head (kstream-tail nstream)) 1)
    (check-equal? (kstream-head (kstream-tail (kstream-tail nstream))) 2)))
+   
+(test-case
+ "naturals from"
+ (let ([nstream (naturals-from 2)])
+   (check-equal? (kstream-head nstream) 2)
+   (check-equal? (kstream-head (kstream-tail nstream)) 3)
+   (check-equal? (kstream-head (kstream-tail (kstream-tail nstream))) 4)))

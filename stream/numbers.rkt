@@ -5,9 +5,9 @@
 (define (ones)
   (kstream 1 ones))
   
-(define (naturals)
-   (define (natgen i)
-     (kstream i (lambda () (natgen (+ i 1)))))
-   (natgen 0)) 
+(define (naturals-from i)
+   (kstream i (lambda () (naturals-from (+ i 1)))))
+
+(define (naturals) (naturals-from 0)) 
   
-(provide ones naturals)
+(provide ones naturals naturals-from)
