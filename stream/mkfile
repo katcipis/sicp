@@ -1,4 +1,5 @@
-test:VQ:
+test:V:
 	racket cons_test.rkt
 	racket stream_test.rkt
+	racket numbers_test.rkt
 	echo "success"

@@ -4,6 +4,8 @@
 
 ;kstream instead of stream because racket already has a stream
 ;a stream is basically lazy evaluation done manually
+;when evaluated the tail of stream should produce another stream
+;which is the next value + a promisse to calculate the rest
 
 (define (kstream head tail)
   (kons head tail))
@@ -19,4 +21,4 @@
     (kstream-head s)
     (kstream-nth (kstream-tail s) (- i 1))))
   
-(provide kstream kstream-head kstream-tail kstream-nth)
+(provide kstream kstream-head kstream-tail kstream-nth kstream-delay)
