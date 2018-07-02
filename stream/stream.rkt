@@ -14,4 +14,9 @@
 (define (kstream-tail s)
   ((kons-tail s)))
   
-(provide kstream kstream-head kstream-tail)
+(define (kstream-nth s i)
+  (if (= i 0)
+    (kstream-head s)
+    (kstream-nth (kstream-tail s) (- i 1))))
+  
+(provide kstream kstream-head kstream-tail kstream-nth)

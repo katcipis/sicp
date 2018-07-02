@@ -19,4 +19,14 @@
      (check-equal? tail "tail")
      )))
      
-;TODO: add kstream-nth to index elements on a stream (start looping recursively)
+(test-case
+ "accessing nth element of a stream calls tail nth - 1 times"
+ (let ([count 0])
+   (define (counter)
+     (set! count (+ 1 count))
+     (kstream count counter))
+     
+   (let ([s (kstream "whatever" counter)] [index 5])
+     (check-equal? (kstream-nth s index) index)
+     (check-equal? count index)
+     )))
