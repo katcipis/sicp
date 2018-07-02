@@ -21,4 +21,4 @@
     (kstream-head s)
     (kstream-nth (kstream-tail s) (- i 1))))
   
-(provide kstream kstream-head kstream-tail kstream-nth kstream-delay)
+(provide kstream kstream-head kstream-tail kstream-nth)
