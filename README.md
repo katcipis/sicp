@@ -254,11 +254,81 @@ we where able to hide it. In the end he is still on doubt if assignments and sta
 trouble...but it is refreshing to see a intelligent perspective (balancing tradeoffs) on the subject
 instead of todays hipe.
 
+## Streaming
+
+Streams are presented as a way to construct infinite sets of values using constant space.
+The base of a stream seems to me to be lazy evaluation. The implementation of stream presented
+is basically one value and a function that will be evaluated later to calculate the rest of
+the data. This reminds of features like Python generators or Lua co-routines. But on lisp this is
+implemented on a much simpler way and with no syntatic support.
+
+Actually the great lesson is that lazy evaluation is really easy to implement in lisp and so is
+streams, as a side effect of that. Although all the manual labor of lazy evaluating things rises
+the question of why not always lazy evaluate everything ? directly on the language ?
+
+On the course this is called [normal order](https://en.wikipedia.org/wiki/Evaluation_strategy#Normal_order)
+evaluation, which reminds me a lot of lazy evaluation. What I'm used to (C/Go/Scheme) is called
+[applicative order](https://en.wikipedia.org/wiki/Evaluation_strategy#Applicative_order).
+
+In an applicative order lisp, this code:
+
+```lisp
+(somefunc 5 (otherfunc 3))
+```
+
+Would eval `(otherfunc 3)` first and them pass the result to **somefunc**. On a normal order language
+`(otherfunc 3)` would be evaluated only when **somefunc** explicitely uses te value. If **somefunc** does not
+use it, or if it juts passes it as a parameter to other function it is not evaluated.
+
+If you think in a call graph the expression is evaluated only at the leaf, when the value is used, when it is
+just passed around it keeps not evaluated. The cool thing is that this is transparent to the programmer,
+so the code looks the same and runs the same, the only difference is that you get lazy evaluation for
+free (something that must be coded manually on an applicative order language).
+
+Well, what is the downside ? On the course (1986) it is mentioned that a lot of languages are exploring this
+idea and they can be used for a lot of things, but operational systems cant be developed with them (at least at
+the time) because of the "dragging tail problem". What would be this problem ? Basically you cant implement
+iterative algorithms on a normal order language, since arguments are always evaluated only when used the
+call graph must be maintained until the argument is evaluated, generating a huge tail. It is the opposite of
+what tail call elimination does when you use recursion, with normal order it is impossible to do tail
+call elimination since by definition you need to maintain the tail until it is lazily evaluated. At the time
+this was a research topic and I don't understand this enough to know if this is still a limitation of
+normal order languages or if there is already some way to circunvent this dowside.
+
+Anyway the streams part of the course gave me a great deal of insight on how lazy evaluation works, and
+how to do it manually in a applicative order language.
+
+On this part of the course some of the downsides of object orientation are discussed against streaming and
+functional programming styles. It is interesting that at the time this was a hot topic and a lot of research
+was being done, and on the course this is presented as a open question and some tradeoffs are discussed
+about maintaining state and side effects versus purely functional. Although usually purely functional
+algotithms are easier to debug and understand, some problems are harder to express like that (the example
+given on the course is a banking system). On the example both streaming programming and functional programming
+lacks the features required to handle the problem properly, which is two different clients manipulating the
+same joint bank account. One of the open problems mentioned is how to isolate this side effect/state part
+of the problem from the rest of the program which is functional, AFAIK this is solved on Haskell with
+[Monads](https://wiki.haskell.org/Monad) for example.
+
+Right now I still lack competence to compare functional and object oriented approaches, specially since
+I'm not very used to purely functional lannguages. It is pretty obvious that everytime you have something
+purely functional, where the substitution model can be applied to your lisp code, debugging and understanding
+will be simpler, but there is too much nuances because of different problems that only hands on experience
+can provide the proper insights.
+
+In the end the more interesting idea presented is that these are tradeoffs, there is no brainless glorification
+of one idea as the best way to solve all the problems, it seems that today we still stand on the same
+point and considering the tradeoffs and working with both techniques seems necessary instead of
+just choosing one of them as the promissed messiah to solve all our problems.
+
+For decades the debate of object orientation VS functional programming basically stalled exactly
+because the industry assumed that object orientation was fitted to all problems. Now it seems that
+we are walking towards making the same mistake, but with functional programming =/.
+
 
 ## Cool Quick Stuff
 
 * High order functions as a way to separate concerns, isolate changes, avoid duplication and express patterns (so much for OO)
-* I found another human being that dislikes mathematical notation as me, got happy :-)
+* I found another human being that dislikes mathematical notation as me, got happy :-) (Gerald Jay Sussman)
 * Abstractions is a way to apply divide and conquer
 
 ## Interesting tasks
