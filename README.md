@@ -315,6 +315,32 @@ purely functional, where the substitution model can be applied to your lisp code
 will be simpler, but there is too much nuances because of different problems that only hands on experience
 can provide the proper insights.
 
+But one idea presented on the course made the comparison more interesting, and I was able to understand better
+with the help of Tiago Natel. When functional programming is compared with object orientation, Alberson starts
+to talk about how in functional programming you don't depend on time, there is no time, which was pretty hard to
+me to understand at the time. But an easy way to see it is the lisp substitution model, if you don't have any
+side effect with the **set!** function you can apply the substitution model to your code, without any sort of
+environment, and you will have the code expanded...ready to be evaluated on just a single step, time is not a factor.
+
+If you need some I/O, time will be a factor. The moment that you perform the I/O in time will
+change the result, and it is not just order of the operations on your code, it is literally time, because I/O
+usually is a door to resources that are shared accross different processes and machines.
+
+This time/sharing component sometimes is intrinsic to the problem that you are solving. The example
+given on the course is a banking system with a joint account. You have different independent people/process
+that will interact with the account, but when one person manipulates the account YOU WANT the other one
+to see the changes, you need side effect, the problem expresses it on itself. Besides watching the side effect
+any operation has a tight coupling with time, if one person takes 100 dolars from the account and the other
+takes 1000 dolars and the account has exactly 1000 dolars just one of the operations will work and what
+will decide which one is time...the order of the operation.
+
+Resuming, the idea is that functional programming allow you to program outside time, like it does not
+exist, like you are on a different universe (a different representation of it at least). But if your problem requires
+time and ordering to be solved correctly you will not be able to solve it with a purely functional code.
+It is good to remember that a **LOT** of problems are decoupled from time and we find ways to couple them
+with time with bad coding =(, so functional programming is a nice idea...but not a new one and not without its
+own tradeoffs.
+
 In the end the more interesting idea presented is that these are tradeoffs, there is no brainless glorification
 of one idea as the best way to solve all the problems, it seems that today we still stand on the same
 point and considering the tradeoffs and working with both techniques seems necessary instead of
