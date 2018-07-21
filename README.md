@@ -415,23 +415,20 @@ I will use define on the code to make it clear that once defined the variable ca
 For two operations the possibilities are:
 
 ```
-(define x 0)
-(define newx (deposit x 100))
-(define newnewx (withdraw newx 100))
+(withdraw (deposit 0 100) 100)
 ```
 
 Which results on success, and a account balance of 0 and:
 
 ```
-(define x 0)
-(define newx (withdraw x 100))
-(define newnewx (deposit newx 100))
+(deposit (withdraw 0 100) 100)
 ```
 
 Which results on an error since withdraw cant return a negative number.
 On both cases the order is part of what makes the code, it is statically defined on it,
-and obviously it won't scale when the number of operations grows bigger (if you squint it
-is the same thing as with the first example with addition and subtraction).
+and obviously it won't scale when the number of operations grows bigger. If you squint it
+is the same thing as with the first example with addition and subtraction, they are actually
+two different function definitions, it is not the same thing but with different orders.
 
 What is interesting now is to question ourselves, from both possibilities, what is the
 correct one ? Who decides that ? Since this is decided by an external agent (a constraint
