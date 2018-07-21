@@ -481,6 +481,25 @@ different computational model, one that resembles more how we work, where you ca
 all the operations, sometimes just remember a single value and forget everything else (people
 usually know how much money they have, but not all the operations that took to get to that state).
 
+I think it is from this that comes the intuition that you can have a piece of "memory" that
+everytime you do an operation you just update that piece of memory. Like if I have 1000 dolars
+on my account, I know that, if I withdraw 100 I will know that now I have 900 dolars. In time
+I will only remember that I have 900 dolars, I wont be thinking about that time when I withdrew
+100 dolars. And this is the model of computing that is more pervasive today, where you have
+variables that can be updated, so everytime a new operation is received you load the current
+value of the variable, perform the operation and store the result back on it. Instead of storing
+all the operations and generate code dynamically you can do a dynamic dispatch of the operations
+and use recursion, a very simple solution (that wont work distributed) is this one:
+
+```
+(define account (balance)
+    (account
+        ((readop) balance))
+
+(account 0)
+```
+
+
 
 ## Cool Quick Stuff
 
