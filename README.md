@@ -350,15 +350,143 @@ For decades the debate of object orientation VS functional programming basically
 because the industry assumed that object orientation was fitted to all problems. Now it seems that
 we are walking towards making the same mistake, but with functional programming =/.
 
+### Time and Ordering
+
+This is a subject that needs to be expanded on its own since it is pretty hard to me
+to understand and it seems pretty fundamental. What is the difference between time
+and ordering ? At first it seems like the order of operations matter, even on
+mathematical thinking, but with further thought it seems that it is because I'm
+adicted to thinking on a different way, when you have a function you don't alter the
+order of things, you can just alter the function itself. For example, lets say we have
+an addition and a subtraction operations, like this:
+
+```
+(+ z (- x y))
+```
+
+It is very clear that the execution has an order, no matter if it is lazy evaluated or not.
+But when I try to think on changing the order of the operations, it makes no sense at all,
+because trying to change the "order" is the action of literally changing the function and its
+meaning, you cant "just" change order of things when you are coding like this. Try to change the
+order of even the simplest code like the one above, what would be to change the order ? add first ?
+add with what ? Perhaps this ?
+
+```
+(- z (+ x y))
+```
+
+But it seems that we actually defined a different function, it is not just a reordering
+of operations. Each function states the order that operations are going to be applied, but
+each of them represent different functions, they are not like the same function just with
+a different order, this makes no sense actually.
+
+The confusion comes from the fact that when the code is evaluated it will be done
+so in a order, and that order is important to get the right result, but this is a property of a correctly
+implemented evalutor, it is even hard to understand how it could not be done so, if it does not evaluate
+on order, what will be the value that will be added with "z" ? The order of operations is coupled
+in the function definition, it makes no sense to think about it changing the order without thinking
+on directly changing the code and its meaning. In this sense the code is completely decoupled
+from time since it will have no say on the order that anything will be executed, this order is
+defined entirely by the static structure of the code, the definition of the functions.
+
+So the order of the operations are embedded on the code itself, the function definition, just
+as in mathematics, how is time modeled and introduced on computing ? At first when I was discussing
+this with some friends it seemed that it would have to be something related to concurrency, because
+you have the exact same code running but something would go differently (like a non-determinism),
+but that was annoying me because at the same time it made sense I remembered that on the course
+there is no paralelism/threading or even concurrency and yet the examples of non-functional code
+where there. In the end concurrency is a subset of the things that introduce coupling to time.
+
+What seems to introduce coupling to time is the interaction with external agents and the requirement
+of having some sort of memory of previous interactions. If you stop to think about it, one way to
+see this is to think about ourselves, we are always interacting with each other and we have
+memory of previous interactions, how to model that with pure mathematics ? I have a feeling that
+this is related to what Alan Kay means when he says that traditional mathematics is not enough
+to represent computation, construction of systems, etc. Not that it is not useful, but it has
+to be extended, we can't think only on pure traditional mathematics for every computational system.
+But this is extremelly far ahead of what I can understand today.
+
+One of the most naive examples on the requirement of memory of previous interactions is the bank
+system mentioned on the course. So lets use it as an example. Lets say we have a bank account
+**x** and a user **y**. The account start with the value 0 and there will be a deposit and a withdraw.
+I won't introduce the requirement of memory yet and
+I will use define on the code to make it clear that once defined the variable can't have its value changed.
+
+For two operations the possibilities are:
+
+```
+(define x 0)
+(define newx (deposit x 100))
+(define newnewx (withdraw newx 100))
+```
+
+Which results on success, and a account balance of 0 and:
+
+```
+(define x 0)
+(define newx (withdraw x 100))
+(define newnewx (deposit newx 100))
+```
+
+Which results on an error since withdraw cant return a negative number.
+On both cases the order is part of what makes the code, it is statically defined on it,
+and obviously it won't scale when the number of operations grows bigger (if you squint it
+is the same thing as with the first example with addition and subtraction).
+
+What is interesting now is to question ourselves, from both possibilities, what is the
+correct one ? Who decides that ? Since this is decided by an external agent (a constraint
+imposed by the requirements) you can't code this previously, the order of operations
+is defined dynamically, in runtime, by something outside your program.
+
+You could for example make something that awaits
+this external stimuli and generates the code accordingly. In lisp it would be
+fairly simple to do that actually. But the thing is, it is that dependency on a external
+stimuli that introduces that notion of time, because usually this represent some interaction
+that comes from the real world, and those interactions will be bound to time and form
+the order of the operations. If I do x now and y tomorrow, the order will be x->y because
+of the moment in time that I choose to perform the operations. As I choose different
+operations the generated code changes to conform to that.
+
+If you continue to push toward something purely functional the code generation idea
+seems to be a way to do that. We can design an extremelly simple model where all
+generated operations are kept (memory) and we always re-evaluate them if you want to
+know the current state of your account. Something like:
+
+```
+(deposit 100)
+(withdraw 10)
+```
+
+Which could be passed to a macro to generate this:
+
+```
+(withdraw 
+  (deposit 0 100) 10)
+```
+
+As more operations are added, the functional version of the code will generate a nasty
+nesting, so it makes sense to have a more clear version that resembles the order of the operations
+and then generate the code that can actually be evaluated by a macro.
+
+To solve the banking system problem you can't escape the need for memory, this list of events
+would have to be stored, and if the system is distributed it the list would have to be distributed with
+the system too. But once the list is loaded in memory, the entire processing is completely
+functional in a mathematical sense, the final code generated will always grant the
+same result when evaluated, time has been used to generate the code, but once generated the code
+is completely decoupled from time.
+
+Well, that sounds awesome but it has a pretty clear drawback, you have to remember and reprocess
+every single operation that happened in your entire life to calculate the state of your account.
+This is not how our memory works, we remember a lot of things, but not everything, and we have
+a lot of pre-calculated states in our heads, because nature is pretty good with optimizations
+(resources in nature are not infinite), so it is tempting to mimic that and come up with a
+different computational model, one that resembles more how we work, where you can sometimes remember
+all the operations, sometimes just remember a single value and forget everything else (people
+usually know how much money they have, but not all the operations that took to get to that state).
+
 
 ## Cool Quick Stuff
 
 * High order functions as a way to separate concerns, isolate changes, avoid duplication and express patterns (so much for OO)
 * I found another human being that dislikes mathematical notation as me, got happy :-) (Gerald Jay Sussman)
 * Abstractions is a way to apply divide and conquer
-
-## Interesting tasks
-
-* Implement sieve of Eratosthenes
-* Implement square root approximation algorithm
-* SAT-3 checker
