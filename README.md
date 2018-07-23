@@ -499,6 +499,51 @@ and use recursion, a very simple solution (that wont work distributed) is this o
 (account 0)
 ```
 
+At first glance it seems pretty functional, but the complexity of handling dynamic operations
+is hidden on **readop**, this is the function that will need some I/O to receive from somewhere
+external to the system what operation needs to be executed, the order of operations will be defined
+by time, the function has no saying on the order, and by definition it is not even a function
+since this makes no sense in math, this is a procedure. And this is coupled with time and
+is modeling it explicitely because it is time that will define the order that operations execute.
+
+It reminds me more of real life, where people asks you to do stuff, and if someone asks you to do
+the same thing sometimes the answer will be different from the previous one. At this point I go back
+to concurrency, even when code is not concurrent itself, I/O models it, because on the world external
+to the program (which is not concurrent) concurrent things are happening, and the order that this
+concurrent events happens outside the program will determine its outcome.
+
+As Alberson said, it is a way to represent reality, object orientation reminds us more of how our
+world works, there is a lot of independent agents, and sending the same message to them does not
+guarantee that the result will be the same. Functional programming is a completely different way
+to think, and when programming on a pure functional way the order of operations is completely
+independent from time or any external interaction, it is defined by the code itself, that is why
+is so easy to debug and analyze this kind of code, but it wont solve all your problem. One
+very easy way to see that functional programming can be easier to understand and debug is that
+correlation and composition is always explicit, when order doesn't matters this is explicit on
+code. For example, on a purely functional lisp, this:
+
+```
+(+ 1 3)
+(- 2 4)
+```
+
+And this:
+
+```
+(- 2 4)
+(+ 1 3)
+```
+
+Will give you the same result, you can invert the order safely and when debugging you can be
+**SURE** that there is no correlation between the two functions. When they are correlated the
+code itself must express that, by using the result of one the operations as the parameter of
+the other. Anyone familiar to programming with side effects and state knows that this not true
+on the object oriented world, just chaing the order of function calls that seem completely
+unrelated can yield different results, through shared state or I/O interaction.
+
+Resuming, on functional code when the order is relevant this is explicit and has nothing to
+do with time, on object oriented code the order may be relevant on a very implicit way and
+coupled with the timing of events happening on other agents (people/machines).
 
 
 ## Cool Quick Stuff
