@@ -382,7 +382,7 @@ a different order, this makes no sense actually.
 
 The confusion comes from the fact that when the code is evaluated it will be done
 so in a order, and that order is important to get the right result, but this is a property of a correctly
-implemented evalutor, it is even hard to understand how it could not be done so, if it does not evaluate
+implemented evaluator, it is even hard to understand how it could not be done so, if it does not evaluate
 on order, what will be the value that will be added with "z" ? The order of operations is coupled
 in the function definition, it makes no sense to think about it changing the order without thinking
 on directly changing the code and its meaning. In this sense the code is completely decoupled
