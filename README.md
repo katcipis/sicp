@@ -492,7 +492,7 @@ all the operations and generate code dynamically you can do a dynamic dispatch o
 and use recursion, a very simple solution (that wont work distributed) is this one:
 
 ```
-(define account (balance)
+(define (account balance)
     (account
         ((readop) balance))
 
