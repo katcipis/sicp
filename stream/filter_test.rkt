@@ -9,7 +9,7 @@
   "filter creates a stream of values where the predicate returns true for each value"
   (define (is-even? v) (= (remainder v 2) 0))
   (define (is-odd? v) (not (is-even? v)))
-  (let ([evens (kfilter naturals is-even?)] [odds (kfilter naturals is-odd?)])
+  (let ([evens (kfilter (naturals) is-even?)] [odds (kfilter (naturals) is-odd?)])
     (check-equal? (kstream-nth evens 0) 0)
     (check-equal? (kstream-nth evens 1) 2)
     (check-equal? (kstream-nth evens 2) 4)
