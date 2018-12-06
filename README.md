@@ -254,15 +254,300 @@ we where able to hide it. In the end he is still on doubt if assignments and sta
 trouble...but it is refreshing to see a intelligent perspective (balancing tradeoffs) on the subject
 instead of todays hipe.
 
+## Streaming
+
+Streams are presented as a way to construct infinite sets of values using constant space.
+The base of a stream seems to me to be lazy evaluation. The implementation of stream presented
+is basically one value and a function that will be evaluated later to calculate the rest of
+the data. This reminds of features like Python generators or Lua co-routines. But on lisp this is
+implemented on a much simpler way and with no syntatic support.
+
+Actually the great lesson is that lazy evaluation is really easy to implement in lisp and so is
+streams, as a side effect of that. Although all the manual labor of lazy evaluating things rises
+the question of why not always lazy evaluate everything ? directly on the language ?
+
+On the course this is called [normal order](https://en.wikipedia.org/wiki/Evaluation_strategy#Normal_order)
+evaluation, which reminds me a lot of lazy evaluation. What I'm used to (C/Go/Scheme) is called
+[applicative order](https://en.wikipedia.org/wiki/Evaluation_strategy#Applicative_order).
+
+In an applicative order lisp, this code:
+
+```lisp
+(somefunc 5 (otherfunc 3))
+```
+
+Would eval `(otherfunc 3)` first and them pass the result to **somefunc**. On a normal order language
+`(otherfunc 3)` would be evaluated only when **somefunc** explicitely uses te value. If **somefunc** does not
+use it, or if it juts passes it as a parameter to other function it is not evaluated.
+
+If you think in a call graph the expression is evaluated only at the leaf, when the value is used, when it is
+just passed around it keeps not evaluated. The cool thing is that this is transparent to the programmer,
+so the code looks the same and runs the same, the only difference is that you get lazy evaluation for
+free (something that must be coded manually on an applicative order language).
+
+Well, what is the downside ? On the course (1986) it is mentioned that a lot of languages are exploring this
+idea and they can be used for a lot of things, but operational systems cant be developed with them (at least at
+the time) because of the "dragging tail problem". What would be this problem ? Basically you cant implement
+iterative algorithms on a normal order language, since arguments are always evaluated only when used the
+call graph must be maintained until the argument is evaluated, generating a huge tail. It is the opposite of
+what tail call elimination does when you use recursion, with normal order it is impossible to do tail
+call elimination since by definition you need to maintain the tail until it is lazily evaluated. At the time
+this was a research topic and I don't understand this enough to know if this is still a limitation of
+normal order languages or if there is already some way to circunvent this dowside.
+
+Anyway the streams part of the course gave me a great deal of insight on how lazy evaluation works, and
+how to do it manually in a applicative order language.
+
+On this part of the course some of the downsides of object orientation are discussed against streaming and
+functional programming styles. It is interesting that at the time this was a hot topic and a lot of research
+was being done, and on the course this is presented as a open question and some tradeoffs are discussed
+about maintaining state and side effects versus purely functional. Although usually purely functional
+algotithms are easier to debug and understand, some problems are harder to express like that (the example
+given on the course is a banking system). On the example both streaming programming and functional programming
+lacks the features required to handle the problem properly, which is two different clients manipulating the
+same joint bank account. One of the open problems mentioned is how to isolate this side effect/state part
+of the problem from the rest of the program which is functional, AFAIK this is solved on Haskell with
+[Monads](https://wiki.haskell.org/Monad) for example.
+
+Right now I still lack competence to compare functional and object oriented approaches, specially since
+I'm not very used to purely functional lannguages. It is pretty obvious that everytime you have something
+purely functional, where the substitution model can be applied to your lisp code, debugging and understanding
+will be simpler, but there is too much nuances because of different problems that only hands on experience
+can provide the proper insights.
+
+But one idea presented on the course made the comparison more interesting, and I was able to understand better
+with the help of Tiago Natel. When functional programming is compared with object orientation, Alberson starts
+to talk about how in functional programming you don't depend on time, there is no time, which was pretty hard to
+me to understand at the time. But an easy way to see it is the lisp substitution model, if you don't have any
+side effect with the **set!** function you can apply the substitution model to your code, without any sort of
+environment, and you will have the code expanded...ready to be evaluated on just a single step, time is not a factor.
+
+If you need some I/O, time will be a factor. The moment that you perform the I/O in time will
+change the result, and it is not just order of the operations on your code, it is literally time, because I/O
+usually is a door to resources that are shared accross different processes and machines.
+
+This time/sharing component sometimes is intrinsic to the problem that you are solving. The example
+given on the course is a banking system with a joint account. You have different independent people/process
+that will interact with the account, but when one person manipulates the account YOU WANT the other one
+to see the changes, you need side effect, the problem expresses it on itself. Besides watching the side effect
+any operation has a tight coupling with time, if one person takes 100 dolars from the account and the other
+takes 1000 dolars and the account has exactly 1000 dolars just one of the operations will work and what
+will decide which one is time...the order of the operation.
+
+Resuming, the idea is that functional programming allow you to program outside time, like it does not
+exist, like you are on a different universe (a different representation of it at least). But if your problem requires
+time and ordering to be solved correctly you will not be able to solve it with a purely functional code.
+It is good to remember that a **LOT** of problems are decoupled from time and we find ways to couple them
+with time with bad coding =(, so functional programming is a nice idea...but not a new one and not without its
+own tradeoffs.
+
+In the end the more interesting idea presented is that these are tradeoffs, there is no brainless glorification
+of one idea as the best way to solve all the problems, it seems that today we still stand on the same
+point and considering the tradeoffs and working with both techniques seems necessary instead of
+just choosing one of them as the promissed messiah to solve all our problems.
+
+For decades the debate of object orientation VS functional programming basically stalled exactly
+because the industry assumed that object orientation was fitted to all problems. Now it seems that
+we are walking towards making the same mistake, but with functional programming =/.
+
+### Time and Ordering
+
+This is a subject that needs to be expanded on its own since it is pretty hard to me
+to understand and it seems pretty fundamental. What is the difference between time
+and ordering ? At first it seems like the order of operations matter, even on
+mathematical thinking, but with further thought it seems that it is because I'm
+adicted to thinking on a different way, when you have a function you don't alter the
+order of things, you can just alter the function itself. For example, lets say we have
+an addition and a subtraction operations, like this:
+
+```
+(+ z (- x y))
+```
+
+It is very clear that the execution has an order, no matter if it is lazy evaluated or not.
+But when I try to think on changing the order of the operations, it makes no sense at all,
+because trying to change the "order" is the action of literally changing the function and its
+meaning, you cant "just" change order of things when you are coding like this. Try to change the
+order of even the simplest code like the one above, what would be to change the order ? add first ?
+add with what ? Perhaps this ?
+
+```
+(- z (+ x y))
+```
+
+But it seems that we actually defined a different function, it is not just a reordering
+of operations. Each function states the order that operations are going to be applied, but
+each of them represent different functions, they are not like the same function just with
+a different order, this makes no sense actually.
+
+The confusion comes from the fact that when the code is evaluated it will be done
+so in a order, and that order is important to get the right result, but this is a property of a correctly
+implemented evaluator, it is even hard to understand how it could not be done so, if it does not evaluate
+on order, what will be the value that will be added with "z" ? The order of operations is coupled
+in the function definition, it makes no sense to think about it changing the order without thinking
+on directly changing the code and its meaning. In this sense the code is completely decoupled
+from time since it will have no say on the order that anything will be executed, this order is
+defined entirely by the static structure of the code, the definition of the functions.
+
+So the order of the operations are embedded on the code itself, the function definition, just
+as in mathematics, how is time modeled and introduced on computing ? At first when I was discussing
+this with some friends it seemed that it would have to be something related to concurrency, because
+you have the exact same code running but something would go differently (like a non-determinism),
+but that was annoying me because at the same time it made sense I remembered that on the course
+there is no paralelism/threading or even concurrency and yet the examples of non-functional code
+where there. In the end concurrency is a subset of the things that introduce coupling to time.
+
+What seems to introduce coupling to time is the interaction with external agents and the requirement
+of having some sort of memory of previous interactions. If you stop to think about it, one way to
+see this is to think about ourselves, we are always interacting with each other and we have
+memory of previous interactions, how to model that with pure mathematics ? I have a feeling that
+this is related to what Alan Kay means when he says that traditional mathematics is not enough
+to represent computation, construction of systems, etc. Not that it is not useful, but it has
+to be extended, we can't think only on pure traditional mathematics for every computational system.
+But this is extremelly far ahead of what I can understand today.
+
+One of the most naive examples on the requirement of memory of previous interactions is the bank
+system mentioned on the course. So lets use it as an example. Lets say we have a bank account
+**x** and a user **y**. The account start with the value 0 and there will be a deposit and a withdraw.
+I won't introduce the requirement of memory yet and
+I will use define on the code to make it clear that once defined the variable can't have its value changed.
+
+For two operations the possibilities are:
+
+```
+(withdraw (deposit 0 100) 100)
+```
+
+Which results on success, and a account balance of 0 and:
+
+```
+(deposit (withdraw 0 100) 100)
+```
+
+Which results on an error since withdraw cant return a negative number.
+On both cases the order is part of what makes the code, it is statically defined on it,
+and obviously it won't scale when the number of operations grows bigger. If you squint it
+is the same thing as with the first example with addition and subtraction, they are actually
+two different function definitions, it is not the same thing but with different orders.
+
+What is interesting now is to question ourselves, from both possibilities, what is the
+correct one ? Who decides that ? Since this is decided by an external agent (a constraint
+imposed by the requirements) you can't code this previously, the order of operations
+is defined dynamically, in runtime, by something outside your program.
+
+You could for example make something that awaits
+this external stimuli and generates the code accordingly. In lisp it would be
+fairly simple to do that actually. But the thing is, it is that dependency on a external
+stimuli that introduces that notion of time, because usually this represent some interaction
+that comes from the real world, and those interactions will be bound to time and form
+the order of the operations. If I do x now and y tomorrow, the order will be x->y because
+of the moment in time that I choose to perform the operations. As I choose different
+operations the generated code changes to conform to that.
+
+If you continue to push toward something purely functional the code generation idea
+seems to be a way to do that. We can design an extremelly simple model where all
+generated operations are kept (memory) and we always re-evaluate them if you want to
+know the current state of your account. Something like:
+
+```
+(deposit 100)
+(withdraw 10)
+```
+
+Which could be passed to a macro to generate this:
+
+```
+(withdraw 
+  (deposit 0 100) 10)
+```
+
+As more operations are added, the functional version of the code will generate a nasty
+nesting, so it makes sense to have a more clear version that resembles the order of the operations
+and then generate the code that can actually be evaluated by a macro.
+
+To solve the banking system problem you can't escape the need for memory, this list of events
+would have to be stored, and if the system is distributed it the list would have to be distributed with
+the system too. But once the list is loaded in memory, the entire processing is completely
+functional in a mathematical sense, the final code generated will always grant the
+same result when evaluated, time has been used to generate the code, but once generated the code
+is completely decoupled from time.
+
+Well, that sounds awesome but it has a pretty clear drawback, you have to remember and reprocess
+every single operation that happened in your entire life to calculate the state of your account.
+This is not how our memory works, we remember a lot of things, but not everything, and we have
+a lot of pre-calculated states in our heads, because nature is pretty good with optimizations
+(resources in nature are not infinite), so it is tempting to mimic that and come up with a
+different computational model, one that resembles more how we work, where you can sometimes remember
+all the operations, sometimes just remember a single value and forget everything else (people
+usually know how much money they have, but not all the operations that took to get to that state).
+
+I think it is from this that comes the intuition that you can have a piece of "memory" that
+everytime you do an operation you just update that piece of memory. Like if I have 1000 dolars
+on my account, I know that, if I withdraw 100 I will know that now I have 900 dolars. In time
+I will only remember that I have 900 dolars, I wont be thinking about that time when I withdrew
+100 dolars. And this is the model of computing that is more pervasive today, where you have
+variables that can be updated, so everytime a new operation is received you load the current
+value of the variable, perform the operation and store the result back on it. Instead of storing
+all the operations and generate code dynamically you can do a dynamic dispatch of the operations
+and use recursion, a very simple solution (that wont work distributed) is this one:
+
+```
+(define (account balance)
+    (account
+        ((readop) balance))
+
+(account 0)
+```
+
+At first glance it seems pretty functional, but the complexity of handling dynamic operations
+is hidden on **readop**, this is the function that will need some I/O to receive from somewhere
+external to the system what operation needs to be executed, the order of operations will be defined
+by time, the function has no saying on the order, and by definition it is not even a function
+since this makes no sense in math, this is a procedure. And this is coupled with time and
+is modeling it explicitely because it is time that will define the order that operations execute.
+
+It reminds me more of real life, where people asks you to do stuff, and if someone asks you to do
+the same thing sometimes the answer will be different from the previous one. At this point I go back
+to concurrency, even when code is not concurrent itself, I/O models it, because on the world external
+to the program (which is not concurrent) concurrent things are happening, and the order that this
+concurrent events happens outside the program will determine its outcome.
+
+As Alberson said, it is a way to represent reality, object orientation reminds us more of how our
+world works, there is a lot of independent agents, and sending the same message to them does not
+guarantee that the result will be the same. Functional programming is a completely different way
+to think, and when programming on a pure functional way the order of operations is completely
+independent from time or any external interaction, it is defined by the code itself, that is why
+is so easy to debug and analyze this kind of code, but it wont solve all your problem. One
+very easy way to see that functional programming can be easier to understand and debug is that
+correlation and composition is always explicit, when order doesn't matters this is explicit on
+code. For example, on a purely functional lisp, this:
+
+```
+(+ 1 3)
+(- 2 4)
+```
+
+And this:
+
+```
+(- 2 4)
+(+ 1 3)
+```
+
+Will give you the same result, you can invert the order safely and when debugging you can be
+**SURE** that there is no correlation between the two functions. When they are correlated the
+code itself must express that, by using the result of one the operations as the parameter of
+the other. Anyone familiar to programming with side effects and state knows that this not true
+on the object oriented world, just chaing the order of function calls that seem completely
+unrelated can yield different results, through shared state or I/O interaction.
+
+Resuming, on functional code when the order is relevant this is explicit and has nothing to
+do with time, on object oriented code the order may be relevant on a very implicit way and
+coupled with the timing of events happening on other agents (people/machines).
+
 
 ## Cool Quick Stuff
 
 * High order functions as a way to separate concerns, isolate changes, avoid duplication and express patterns (so much for OO)
-* I found another human being that dislikes mathematical notation as me, got happy :-)
+* I found another human being that dislikes mathematical notation as me, got happy :-) (Gerald Jay Sussman)
 * Abstractions is a way to apply divide and conquer
-
-## Interesting tasks
-
-* Implement sieve of Eratosthenes
-* Implement square root approximation algorithm
-* SAT-3 checker

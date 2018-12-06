@@ -2,7 +2,6 @@
 
 (require "damp.rkt" "fixed-point.rkt")
 
-
 (define (sqrt-base x next guess precision maxiter)
   (fixed-point
     (lambda (guess)
