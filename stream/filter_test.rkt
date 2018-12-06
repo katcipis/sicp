@@ -6,7 +6,7 @@
          "filter.rkt")
 
 (test-case
-  "filters only values where predicate indicates true"
+  "filter creates a stream of values where the predicate returns true for each value"
   (define (is-even? v) (= (remainder v 2) 0))
   (define (is-odd? v) (not (is-even? v)))
   (let ([evens (kfilter naturals is-even?)] [odds (kfilter naturals is-odd?)])
