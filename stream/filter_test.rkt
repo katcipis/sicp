@@ -15,6 +15,4 @@
     (check-equal? (kstream-nth evens 2) 4)
     (check-equal? (kstream-nth odds 0) 1)
     (check-equal? (kstream-nth odds 1) 3)
-    (check-equal? (kstream-nth odds 2) 5)
-    )
-)
+    (check-equal? (kstream-nth odds 2) 5)))

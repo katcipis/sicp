@@ -3,3 +3,4 @@ test:V:
 	racket stream_test.rkt
 	racket numbers_test.rkt
 	racket filter_test.rkt
+	racket prime_test.rkt
