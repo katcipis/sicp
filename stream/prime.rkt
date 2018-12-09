@@ -5,11 +5,10 @@
          "filter.rkt")
 
 (define (primes-stream)
-  (let ([pstream (naturals-from 1)])
-  (define (lazynext)
-    (set! pstream (primes-next (kstream-tail pstream)))
-    (kstream (kstream-head pstream) lazynext))
-  (lazynext)))
+  (define (lazynext cur)
+    (let ([next (primes-next (kstream-tail cur))])
+      (kstream (kstream-head next) (lambda () (lazynext next)))))
+  (lazynext (naturals-from 1)))
 
 (define (primes-next s)
   (kstream (kstream-head s) (lambda ()
