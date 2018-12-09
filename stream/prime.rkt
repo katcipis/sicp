@@ -5,17 +5,17 @@
          "filter.rkt")
 
 (define (primes-stream)
-  (let ([first (primes-next 2 (naturals-from 3))])
-  (kstream 2 (lambda ()
-    (let ([next (kstream-tail first)])
-       (kstream (kstream-head next) (lambda ()
-         (primes-next (kstream-head next) next))))))))
+  (let ([pstream (naturals-from 1)])
+  (define (lazynext)
+    (set! pstream (primes-next (kstream-tail pstream)))
+    (kstream (kstream-head pstream) lazynext))
+  (lazynext)))
 
-(define (primes-next i s)
-  (kstream i (lambda ()
-    (kfilter s (not-multiple-of i)))))
+(define (primes-next s)
+  (kstream (kstream-head s) (lambda ()
+    (kfilter s (not-multiple-of (kstream-head s))))))
 
-(define (not-multiple-of v)
-  (lambda (x) (not(= (remainder x v) 0))))
+(define (not-multiple-of i)
+  (lambda (x) (not(= (remainder x i) 0))))
 
 (provide primes-stream)
