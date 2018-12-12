@@ -30,3 +30,20 @@
      (check-equal? (kstream-nth s index) index)
      (check-equal? count index)
      )))
+
+(test-case
+ "taking n elements of a stream using kstream-take"
+ (define (zeros)
+   (kstream 0 zeros))
+ (define finite-stream
+   (kstream 1
+            (lambda ()
+              (kstream 2
+                       (lambda ()
+                         (kstream 3
+                                  (lambda () '())))))))
+ (let ([z (zeros)])
+  (check-equal? (kstream-take z 0) '())
+  (check-equal? (length (kstream-take z 3)) 3)
+  (check-equal? (kstream-take z 3) '(0 0 0))
+  (check-equal? (kstream-take finite-stream 10) '(1 2 3))))

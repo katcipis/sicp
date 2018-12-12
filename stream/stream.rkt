@@ -20,5 +20,13 @@
   (if (= i 0)
     (kstream-head s)
     (kstream-nth (kstream-tail s) (- i 1))))
-  
-(provide kstream kstream-head kstream-tail kstream-nth)
+
+(define (kstream-take s n)
+  (cond
+   [(<= n 0) '()]
+   [(null? (kstream-tail s)) (list (kstream-head s))]
+   [else (cons (kstream-head s)
+               (kstream-take (kstream-tail s)
+                             (- n 1)))]))
+
+(provide kstream kstream-head kstream-tail kstream-nth kstream-take)
