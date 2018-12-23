@@ -2,4 +2,5 @@ test:V:
 	racket cons_test.rkt
 	racket stream_test.rkt
 	racket numbers_test.rkt
-	echo "success"
+	racket filter_test.rkt
+	racket prime_test.rkt
