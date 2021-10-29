@@ -10,8 +10,9 @@
     - [Naming Spirits](#naming-spirits)
     - [Generic Operators](#generic-operators)
     - [Assignment, State, and Side-effects](#assignment-state-and-sideeffects)
+    - [Streaming](#streaming)
+        - [Time and Ordering](#time-and-ordering)
     - [Cool Quick Stuff](#cool-quick-stuff)
-    - [Interesting tasks](#interesting-tasks)
 
 <!-- mdtocend -->
 
